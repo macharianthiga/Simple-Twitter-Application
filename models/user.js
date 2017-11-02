@@ -33,6 +33,10 @@ UserSchema.methods.gravatar = function(size) {
   if(!this.email) return 'https://gravatar.com/avatar/?s=' + size + '&d=retro';
   var md5 = crypto.createHash('md5').update(this.email).digest('hex');
   return '/https://gravatar.com/' + md5 + '?s=' + size + '&d=retro';
+};
+
+UserSchema.methods.comparePassword = function(password){
+  return bcrypt.compareSync(password, this.password);
 }
 
 module.exports =  mongoose.model('User', UserSchema);
