@@ -1,4 +1,6 @@
 const mongoose = require('mongoose'),
+      bcrypt   =  require('bcrypt-nodejs'),
+      crypto   =  require('crypto'),
       Schema   = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -11,5 +13,26 @@ const UserSchema = new Schema({
   }]
 });
 
+UserSchema.pre('save', function(next){
+  var user = this;
+  if (!user.isModified('password')) return next();
+  if (user.password) {
+    bcrypt.genSalt(10, function(err, salt) {
+      if (err) return next(err);
+      bcrypt.hash(user.password, salt, null, function(err, hash) {
+        if (err) return next();
+        user.password = hash;
+        next(err);
+      });
+    });
+  }
+});
+
+UserSchema.methods.gravatar = function(size) {
+  if(!size) size = 200;
+  if(!this.email) return 'https://gravatar.com/avatar/?s=' + size + '&d=retro';
+  var md5 = crypto.createHash('md5').update(this.email).digest('hex');
+  return '/https://gravatar.com/' + md5 + '?s=' + size + '&d=retro';
+}
+
 module.exports =  mongoose.model('User', UserSchema);
- 
