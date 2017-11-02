@@ -8,7 +8,10 @@ const express     = require('express'),
       app         = express();
 
 
-
+mongoose.connect('mongodb://localhost/twittA', function(err){
+  if (err) console.log(err);
+  console.log("connected to the database");
+});
 
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
 app.set('view engine',  'hbs');
